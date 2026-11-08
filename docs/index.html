@@ -60,5 +60,83 @@ document.getElementById('saveSettings').addEventListener('click',()=>{const mini
 draw();
 })();
 </script>
+  <section style="max-width:780px;margin:16px auto;padding:20px;background:white;border-radius:14px">
+  <h2>🔄 Manuális frissítés</h2>
+  <p>Az akciókeresés kézi elindítása.</p>
+
+  <input id="frissites-kulcs" type="password"
+    placeholder="Titkos frissítési kulcs"
+    autocomplete="off"
+    style="padding:12px;width:100%;margin-bottom:10px">
+
+  <button id="frissites-gomb" type="button"
+    style="padding:14px;background:#087452;color:white;border:0;border-radius:8px">
+    🔄 Frissítés most
+  </button>
+
+  <button id="adatok-gomb" type="button"
+    style="padding:14px;border-radius:8px">
+    Eredmények ellenőrzése
+  </button>
+
+  <p id="frissites-uzenet" role="status"></p>
+</section>
+
+<script>
+(() => {
+  const endpoint =
+    "https://akciofigyelo-frissites.szabolcs7583.workers.dev/refresh";
+  const button = document.getElementById("frissites-gomb");
+  const check = document.getElementById("adatok-gomb");
+  const message = document.getElementById("frissites-uzenet");
+  const input = document.getElementById("frissites-kulcs");
+
+  button.addEventListener("click", async () => {
+    const key = input.value.trim();
+    if (!key) {
+      message.textContent = "Add meg a frissítési kulcsot!";
+      return;
+    }
+
+    input.value = "";
+    button.disabled = true;
+    message.textContent = "Frissítés indítása...";
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "X-Refresh-Key": key }
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Indítási hiba");
+      }
+      message.textContent =
+        "✅ A keresés elindult. Az eredmények később frissülnek.";
+    } catch (error) {
+      message.textContent = "❌ " + error.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  check.addEventListener("click", async () => {
+    message.textContent = "Adatok ellenőrzése...";
+    try {
+      const response = await fetch(
+        "akciok.json?t=" + Date.now(),
+        { cache: "no-store" }
+      );
+      if (!response.ok) throw new Error("Az adatfájl nem érhető el");
+      const data = await response.json();
+      message.textContent =
+        "Utolsó ellenőrzés: " + (data.updated_utc || "ismeretlen") +
+        " | Rögzített ajánlatok: " + (data.offers || []).length;
+    } catch (error) {
+      message.textContent = "❌ " + error.message;
+    }
+  });
+})();
+</script>
 </body>
 </html>

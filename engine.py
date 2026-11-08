@@ -207,7 +207,7 @@ def run(config, dry_run=False):
                 continue
             offers.append({**product, 'discount': pct, 'source': source})
     db.commit()
-     if offers:
+    if offers:
         if dry_run:
             for item in offers:
                 print(

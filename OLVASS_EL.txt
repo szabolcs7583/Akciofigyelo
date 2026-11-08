@@ -1,0 +1,22 @@
+MAGYAR AKCIÓFIGYELŐ – ANDROID + INGYENES GITHUB ACTIONS
+
+1. A GitHubon hozz létre egy ÚJ PUBLIC repository-t, például: akciofigyelo.
+2. A ZIP-ben lévő fájlokat és mappákat (nem a külső mappát) töltsd fel a repository gyökerébe. A .github/workflows/figyelo.yml fájlt is! Androidon a GitHub weboldalának asztali nézete segíthet; sok fájlhoz számítógép egyszerűbb.
+3. Settings > Secrets and variables > Actions > New repository secret:
+   MAIL_FROM = a Gmail-címed
+   MAIL_TO = az értesítést fogadó e-mail-címed
+   MAIL_APP_PASSWORD = Google 2-lépcsős azonosítás mellett létrehozott alkalmazásjelszó (nem a normál Gmail-jelszó)
+   FIGYELEM: a jelszót kizárólag GitHub Secret-ként add meg, ne fájlba és ne chatben!
+4. Actions fül > Akciofigyelo > Run workflow > Run workflow. Nézd meg a futás naplóját.
+5. Settings > Pages > Build and deployment > Deploy from a branch > main > /docs > Save.
+6. Néhány perc múlva a Pages felületen megjelenik az oldal címe, általában https://FELHASZNALO.github.io/akciofigyelo/ . A tényleges URL-t a GitHub Pages beállításánál nézd meg.
+7. Android Chrome-ban nyisd meg az oldalt > menü (három pont) > Hozzáadás a kezdőképernyőhöz / Telepítés (ami elérhető).
+
+FONTOS KORLÁTOK:
+- Ez mobilra telepíthető WEBOLDAL (PWA), nem APK; internetkapcsolat kell hozzá.
+- A GitHub Actions kb. 6 óránként próbál futni, de az időzítés késhet vagy elmaradhat; a GitHub inaktív nyilvános repóknál leállíthatja az időzítést.
+- A nyilvános repositoryban az ár-adatbázis és a találatok nyilvánosan látszanak; e-mail-jelszó nem kerül bele.
+- Csak a megadott weboldalakon található, hozzáférhető JSON-LD termékadatokat olvassa. Kezdőlapokon gyakran NINCS ilyen adat, ezért lehet, hogy nulla találat lesz. Ez nem teljes webshop-katalógus, és nem garantált 50%-os valós árengedmény.
+- A 30 napos legalacsonyabb ár nem ellenőrzött; a saját ártörténet csak a telepítés után gyűlik.
+- Ha e-mail nem érkezik, lehet, hogy nincs találat; a Gmail-jelszó hibás; vagy az adott webshop nem ad feldolgozható adatot. Ellenőrizd az Actions naplóját.
+- A GitHub Actions és Pages ingyenes használata a GitHub aktuális feltételeitől és korlátaitól függ.

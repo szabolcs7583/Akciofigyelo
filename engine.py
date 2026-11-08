@@ -207,14 +207,34 @@ def run(config, dry_run=False):
                 continue
             offers.append({**product, 'discount': pct, 'source': source})
     db.commit()
-    if offers and email_alert(config, offers, dry_run):
-        if not dry_run:
+     if offers:
+        if dry_run:
             for item in offers:
-                db.execute('INSERT INTO alerts(url,best_discount,last_alert) VALUES(?,?,?) ON CONFLICT(url) DO UPDATE SET best_discount=excluded.best_discount,last_alert=excluded.last_alert',
-                           (item['url'], item['discount'], datetime.now(timezone.utc).isoformat()))
+                print(
+                    item["name"],
+                    item["discount"],
+                    item["url"]
+                )
+        else:
+            for item in offers:
+                db.execute(
+                    """INSERT INTO alerts
+                    (url, best_discount, last_alert)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT(url) DO UPDATE SET
+                    best_discount=excluded.best_discount,
+                    last_alert=excluded.last_alert""",
+                    (
+                        item["url"],
+                        item["discount"],
+                        datetime.now(timezone.utc).isoformat()
+                    )
+                )
             db.commit()
-    elif not offers:
-        logging.info('Most nincs új, legalább %s%%-os észlelt ajánlat.', threshold)
+            logging.info("%s akció elmentve.", len(offers))
+    else:
+        logging.info("Nincs új megfelelő akció.")
+
     db.close()
 
 

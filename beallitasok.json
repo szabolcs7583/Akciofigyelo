@@ -1,9 +1,9 @@
 {
   "minimum_kedvezmeny": 50,
-  "figyelt_oldalak": [
-    {"url": "https://www.alza.hu/"},
-    {"url": "https://www.emag.hu/"},
-    {"url": "https://www.mediamarkt.hu/"}
-  ],
+  "figyelt_feedek": [
+  {
+    "url": "https://plantapont.hu/gfeed.php"
+  }
+]
   "email": {"smtp_szerver": "smtp.gmail.com", "smtp_port": 465, "felado": "", "cimzett": ""}
 }

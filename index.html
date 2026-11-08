@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123b38">
+<meta name="description" content="Magyar webshopok akciófigyelése">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Magyar Akciófigyelő</title>
+<style>
+*{box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;margin:0;background:#f2f6f4;color:#19312d}header{background:#123b38;color:#fff;padding:24px 18px}main{max-width:780px;margin:auto;padding:16px}header main{padding:0}h1{font-size:1.6rem;margin:0 0 8px}h2{font-size:1.15rem;margin:0 0 14px}header p{margin:0;color:#d1e7df}article,section{background:#fff;padding:20px;margin:0 0 14px;border-radius:14px;box-shadow:0 2px 8px #153a3010}.sale{display:inline-block;background:#d5f6e5;color:#095934;border-radius:20px;padding:5px 12px;font-weight:800}a{color:#09624e;font-weight:700}small{display:block;color:#68736f;margin-top:16px}.empty{background:white;padding:24px;border-radius:14px}footer{font-size:.82rem;color:#576b64;margin:28px 0}.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.choice{display:flex;gap:8px;align-items:center;border:1px solid #d4e2dc;border-radius:10px;padding:10px;overflow-wrap:anywhere}input[type=checkbox]{width:20px;height:20px;accent-color:#09624e}input[type=number],input[type=text]{font:inherit;border:1px solid #aebfb7;border-radius:8px;padding:10px;max-width:100%}input[type=number]{width:100px}.field{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:16px 0}button{font:inherit;border:0;background:#09624e;color:#fff;padding:11px 16px;border-radius:9px;font-weight:700;cursor:pointer}button.secondary{background:#e2efe9;color:#095934}.custom-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}.status{margin-top:12px;color:#095934;font-weight:650}.muted{color:#576b64;font-size:.9rem}
+</style>
+</head>
+<body>
+<header><main><h1>🛍️ Magyar Akciófigyelő</h1><p>Akciók a saját érdeklődési köröd szerint</p></main></header>
+<main>
+<section aria-labelledby="settings-title">
+<h2 id="settings-title">⚙️ Saját figyelési beállítások</h2>
+<p>Válaszd ki a kategóriákat, amelyek érdekelnek.</p>
+<div id="categories" class="choices"></div>
+<div class="field"><input id="newCategory" type="text" maxlength="60" placeholder="Új kategória neve" aria-label="Új kategória neve"><button id="addCategory" type="button" class="secondary">+ Hozzáadás</button></div>
+<div id="customCategories"></div>
+<div class="field"><label for="minDiscount">Minimum kedvezmény:</label><input id="minDiscount" type="number" min="0" max="100" step="1" value="50"> %</div>
+<button id="saveSettings" type="button">Beállítások mentése</button>
+<div id="status" class="status" role="status" aria-live="polite"></div>
+<p class="muted">A beállítások ezen a készüléken, ebben a böngészőben tárolódnak. A szerveroldali automatikus kereséshez külön összekapcsolás szükséges.</p>
+</section>
+<section aria-labelledby="offers-title"><h2 id="offers-title">🔎 Talált akciók</h2>
+<p>Utolsó ellenőrzés: 2026-11-08 13:13 (UTC)</p>
+<p class="empty">Még nincs rögzített, legalább 50%-os ajánlat. A figyelés futtatás után gyűjt adatokat.</p>
+</section>
+<footer>A kedvezmények webshopos referenciaárból vagy korábban megfigyelt árból származhatnak. A korábbi ár nem feltétlenül 30 napos legalacsonyabb ár. A készletet és az aktuális árat mindig ellenőrizd a kereskedőnél.</footer>
+</main>
+<script>
+(()=>{
+'use strict';
+const KEY='akciofigyelo-preferences-v1';
+const defaults=['Elektronika','Háztartás','Ruházat','Barkács','Játékok','Szépségápolás','Sport','Élelmiszer'];
+let saved={};
+try{saved=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){saved={}}
+let custom=Array.isArray(saved.custom)?saved.custom.filter(x=>typeof x==='string'&&x.trim()).slice(0,30):[];
+let selected=Array.isArray(saved.categories)?saved.categories:defaults.slice();
+const categoryBox=document.getElementById('categories');
+const customBox=document.getElementById('customCategories');
+const status=document.getElementById('status');
+function draw(){
+categoryBox.replaceChildren();customBox.replaceChildren();
+for(const name of [...defaults,...custom]){
+const label=document.createElement('label');label.className='choice';
+const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.value=name;checkbox.checked=selected.includes(name);
+checkbox.addEventListener('change',()=>{selected=checkbox.checked?[...new Set([...selected,name])]:selected.filter(x=>x!==name);status.textContent='A változtatások mentéséhez nyomd meg a Mentés gombot.'});
+label.append(checkbox,document.createTextNode(name));categoryBox.append(label);
+}
+for(const name of custom){const row=document.createElement('div');row.className='custom-row';const text=document.createElement('span');text.textContent=name;const del=document.createElement('button');del.className='secondary';del.type='button';del.textContent='Eltávolítás';del.setAttribute('aria-label',name+' eltávolítása');del.addEventListener('click',()=>{custom=custom.filter(x=>x!==name);selected=selected.filter(x=>x!==name);draw();status.textContent='A kategória eltávolítva. Mentsd a változtatásokat.'});row.append(text,del);customBox.append(row)}
+}
+const discount=document.getElementById('minDiscount');
+if(Number.isInteger(Number(saved.minimum))&&Number(saved.minimum)>=0&&Number(saved.minimum)<=100&&saved.minimum!==undefined)discount.value=saved.minimum;
+document.getElementById('addCategory').addEventListener('click',()=>{const field=document.getElementById('newCategory');const name=field.value.trim().replace(/\s+/g,' ');if(!name)return;if([...defaults,...custom].some(x=>x.toLocaleLowerCase('hu')===name.toLocaleLowerCase('hu'))){status.textContent='Ez a kategória már létezik.';return}if(custom.length>=30){status.textContent='Legfeljebb 30 saját kategória adható hozzá.';return}custom.push(name);selected.push(name);field.value='';draw();status.textContent='Új kategória hozzáadva. Mentsd a változtatásokat.'});
+document.getElementById('saveSettings').addEventListener('click',()=>{const minimum=Number(discount.value);if(discount.value.trim()===''||!Number.isInteger(minimum)||minimum<0||minimum>100){status.textContent='Adj meg egy egész számot 0 és 100 között.';return}try{localStorage.setItem(KEY,JSON.stringify({categories:selected,custom,minimum}));status.textContent='✅ A beállításokat elmentettük ezen a készüléken.'}catch(e){status.textContent='Nem sikerült menteni. Ellenőrizd a böngésző tárhelybeállításait.'}});
+draw();
+})();
+</script>
+</body>
+</html>

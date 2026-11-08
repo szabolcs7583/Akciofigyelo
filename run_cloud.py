@@ -7,7 +7,7 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 import engine
-
+import feed_import
 BASE = Path(__file__).resolve().parent
 config = json.loads((BASE / 'beallitasok.json').read_text(encoding='utf-8'))
 config.setdefault('email', {})
@@ -17,6 +17,7 @@ if os.getenv('AKCIOFIGYELO_EMAIL_JELSZO') and not (config['email']['felado'] and
     raise SystemExit('A MAIL_FROM és MAIL_TO titkokat is be kell állítani.')
 
 engine.run(config)
+feed_import.scan(config)
 rows = []
 if (BASE / 'arak.sqlite3').exists():
     with sqlite3.connect(BASE / 'arak.sqlite3') as db:

@@ -1,9 +1,6 @@
 {
   "minimum_kedvezmeny": 50,
-  "figyelt_feedek": [
-  {
-    "url": "https://plantapont.hu/gfeed.php"
-  }
-]
+  "figyelt_feedek": 
+  [{"url": "https://plantapont.hu/gfeed.php"}]
   "email": {"smtp_szerver": "smtp.gmail.com", "smtp_port": 465, "felado": "", "cimzett": ""}
 }
